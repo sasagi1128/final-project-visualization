@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visualization Study – BYU Hawaii</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+:root{
+  --navy:#0f1f3d;--teal:#1a7a5e;--teal-lt:#22a07a;--teal-pale:#e8f5f0;
+  --gold:#c8a84b;--border:#ddd6cc;--bg:#f7f5f1;--white:#fff;
+  --grey:#5f6b7a;--red:#c0392b;--text:#1c2b3a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
+
+/* ── HEADER ── */
+header{
+  background:var(--navy);color:#fff;
+  padding:14px 32px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)
+}
+.logo{font-family:'Source Serif 4',serif;font-size:1rem;letter-spacing:.01em}
+.logo b{color:var(--gold)}
+.hdr-right{display:flex;align-items:center;gap:16px}
+.step-label{font-size:.75rem;color:rgba(255,255,255,.55);letter-spacing:.04em}
+.prog-wrap{width:180px;height:3px;background:rgba(255,255,255,.15);border-radius:2px}
+.prog-bar{height:100%;background:var(--teal-lt);border-radius:2px;transition:width .5s ease}
+
+/* ── PAGE SYSTEM ── */
+.page{display:none}
+.page.active{display:block;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.wrap{max-width:900px;margin:0 auto;padding:44px 24px 80px}
+
+/* ── INTRO ── */
+.intro-hero{text-align:center;padding:56px 0 44px}
+.intro-hero h1{
+  font-family:'Source Serif 4',serif;font-size:2.4rem;line-height:1.25;
+  margin-bottom:14px;font-weight:300
+}
+.intro-hero h1 strong{color:var(--teal);font-weight:600}
+.intro-hero p{color:var(--grey);font-size:1rem;line-height:1.75;max-width:540px;margin:0 auto 36px}
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:40px}
+.card3{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:22px 16px;text-align:center}
+.card3 .ic{font-size:1.8rem;margin-bottom:8px}
+.card3 h4{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--teal);margin-bottom:4px;font-weight:600}
+.card3 p{font-size:.87rem;color:var(--grey)}
+
+/* ── CONSENT ── */
+.consent-scroll{
+  background:var(--white);border:1px solid var(--border);border-radius:14px;
+  padding:36px;max-height:360px;overflow-y:auto;
+  font-size:.9rem;line-height:1.85;color:#333;margin-bottom:28px
+}
+.consent-scroll h2{font-family:'Source Serif 4',serif;font-size:1.5rem;margin-bottom:18px}
+.consent-scroll h3{font-size:.9rem;font-weight:600;margin:18px 0 6px;color:var(--navy)}
+.check-row{
+  display:flex;gap:13px;align-items:flex-start;
+  background:var(--teal-pale);border:1px solid var(--teal-lt);
+  border-radius:10px;padding:16px 18px;margin-bottom:24px;cursor:pointer
+}
+.check-row input{width:18px;height:18px;accent-color:var(--teal);flex-shrink:0;cursor:pointer}
+.check-row label{font-size:.92rem;line-height:1.5;cursor:pointer}
+.field-block{margin-bottom:24px}
+.field-block label{display:block;font-weight:500;font-size:.87rem;margin-bottom:7px;color:var(--navy)}
+.field-block input,.field-block select{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;
+  font-family:'Inter',sans-serif;font-size:.95rem;background:var(--white);color:var(--text);
+  transition:border-color .2s
+}
+.field-block input:focus,.field-block select:focus{outline:none;border-color:var(--teal)}
+.err{color:var(--red);font-size:.82rem;margin-top:5px;display:none}
+
+/* ── SECTION HEADER ── */
+.sec-head{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.badge{
+  background:var(--navy);color:#fff;padding:5px 13px;border-radius:20px;
+  font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap
+}
+.sec-title{font-family:'Source Serif 4',serif;font-size:1.75rem;font-weight:300}
+
+/* ── PRACTICE NOTE ── */
+.note-box{
+  background:#fffbee;border:1px solid #e8d07a;border-radius:9px;
+  padding:14px 18px;margin-bottom:22px;font-size:.88rem;color:#6b5200;
+  display:flex;gap:10px
+}
+
+/* ── VIZ CARD ── */
+.viz-card{
+  background:var(--white);border:1px solid var(--border);border-radius:16px;
+  padding:28px 24px 24px;margin-bottom:24px
+}
+.viz-card h3{font-family:'Source Serif 4',serif;font-size:1.25rem;margin-bottom:5px}
+.viz-card .viz-sub{font-size:.83rem;color:var(--grey);margin-bottom:20px;line-height:1.5}
+
+/* Legend */
+.legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:14px}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:.8rem}
+.leg-dot{width:11px;height:11px;border-radius:50%}
+.leg-line{width:22px;height:3px;border-radius:2px}
+
+/* ── QUESTIONS ── */
+.q-stack{display:flex;flex-direction:column;gap:20px}
+.q-card{background:var(--white);border:1px solid var(--border);border-radius:13px;padding:24px 24px 20px}
+.q-lbl{font-size:.72rem;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.q-txt{font-size:.97rem;font-weight:500;line-height:1.55;margin-bottom:16px}
+.radio-col{display:flex;flex-direction:column;gap:9px}
+.r-opt{
+  display:flex;align-items:center;gap:11px;padding:11px 14px;
+  border:1.5px solid var(--border);border-radius:8px;cursor:pointer;
+  transition:all .13s;font-size:.9rem;user-select:none
+}
+.r-opt:hover{border-color:var(--teal);background:var(--teal-pale)}
+.r-opt input{accent-color:var(--teal);width:15px;height:15px}
+.r-opt.sel{border-color:var(--teal);background:var(--teal-pale);font-weight:500}
+
+/* Likert */
+.likert-row{display:flex;gap:7px}
+.lk-btn{
+  flex:1;padding:11px 2px;border-radius:7px;
+  border:1.5px solid var(--border);background:var(--white);
+  cursor:pointer;font-size:.9rem;font-weight:500;
+  font-family:'Inter',sans-serif;transition:all .13s;text-align:center
+}
+.lk-btn:hover{border-color:var(--teal);background:var(--teal-pale)}
+.lk-btn.sel{background:var(--teal);color:#fff;border-color:var(--teal)}
+.lk-labels{display:flex;justify-content:space-between;font-size:.73rem;color:var(--grey);margin-top:5px}
+
+/* Open text */
+.open-ta{
+  width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:8px;
+  font-family:'Inter',sans-serif;font-size:.9rem;resize:vertical;min-height:88px;
+  background:var(--bg);transition:border-color .2s
+}
+.open-ta:focus{outline:none;border-color:var(--teal);background:var(--white)}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;justify-content:flex-end;align-items:center;margin-top:32px;gap:10px}
+.btn{padding:12px 30px;border-radius:9px;font-family:'Inter',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{background:var(--teal-lt);transform:translateY(-1px)}
+.btn-primary:disabled{background:#aaa;cursor:not-allowed;transform:none}
+.btn-ghost{background:transparent;color:var(--navy);border:1.5px solid var(--border)}
+.btn-ghost:hover{border-color:var(--navy)}
+
+/* ── TRANSITION ── */
+.transition-center{text-align:center;padding:90px 20px}
+.transition-center .big-icon{font-size:3.5rem;margin-bottom:22px}
+.transition-center h2{font-family:'Source Serif 4',serif;font-size:2rem;font-weight:300;margin-bottom:14px}
+.transition-center p{color:var(--grey);font-size:1rem;line-height:1.7;max-width:480px;margin:0 auto 36px}
+
+/* ── DONE ── */
+.done-hero{text-align:center;padding:70px 20px 40px}
+.done-check{width:68px;height:68px;border-radius:50%;background:var(--teal);color:#fff;font-size:2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 22px}
+.done-hero h1{font-family:'Source Serif 4',serif;font-size:2.2rem;font-weight:300;margin-bottom:14px}
+.done-hero p{color:var(--grey);line-height:1.75;max-width:460px;margin:0 auto 12px}
+.pid-box{display:inline-block;margin-top:22px;background:var(--navy);color:#fff;padding:11px 26px;border-radius:9px;font-family:monospace;font-size:.87rem;letter-spacing:.07em}
+.debrief-box{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:28px;margin-top:36px;font-size:.93rem;line-height:1.8;color:#333}
+.debrief-box h3{font-family:'Source Serif 4',serif;font-size:1.3rem;margin-bottom:10px}
+.admin-row{text-align:center;margin-top:28px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+#data-panel{display:none;position:fixed;bottom:0;left:0;right:0;background:#0a1628;color:#a0f0d0;padding:14px 20px;font-family:monospace;font-size:.75rem;max-height:220px;overflow-y:auto;border-top:2px solid var(--teal)}
+
+/* scrollbar */
+.consent-scroll::-webkit-scrollbar{width:5px}
+.consent-scroll::-webkit-scrollbar-track{background:#f0ece4;border-radius:3px}
+.consent-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+canvas{display:block;margin:0 auto}
+
+@media(max-width:600px){
+  .cards3{grid-template-columns:1fr}
+  .intro-hero h1{font-size:1.7rem}
+  header{padding:12px 16px}
+  .prog-wrap{width:100px}
+  .likert-row{gap:4px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">BYU<b>H</b> · Visualization Research Study</div>
+  <div class="hdr-right">
+    <span class="step-label" id="step-lbl">Welcome</span>
+    <div class="prog-wrap"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
+  </div>
+</header>
+
+<!-- ══ PAGE 0: INTRO ══════════════════════════════════════ -->
+<div class="page active" id="pg-intro">
+<div class="wrap">
+  <div class="intro-hero">
+    <h1>Sleep, Stress &<br><strong>GPA</strong> Visualization Study</h1>
+    <p>We're comparing two different ways to visualize the same data. Your participation helps us understand which chart styles are easiest to analyze. Takes about 10–15 minutes.</p>
+  </div>
+  <div class="cards3">
+    <div class="card3"><div class="ic">⏱</div><h4>Duration</h4><p>10–15 minutes</p></div>
+    <div class="card3"><div class="ic">🔒</div><h4>Anonymous</h4><p>Only a random ID is stored</p></div>
+    <div class="card3"><div class="ic">🍬</div><h4>Reward</h4><p>Candy after completion</p></div>
+  </div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="go(1)">Get Started →</button></div>
+</div>
+</div>
+
+<!-- ══ PAGE 1: CONSENT ════════════════════════════════════ -->
+<div class="page" id="pg-consent">
+<div class="wrap">
+  <div class="sec-head"><span class="badge">Step 1 of 7</span><h2 class="sec-title">Informed Consent</h2></div>
+
+  <div class="consent-scroll">
+    <h2>Research Participation Agreement</h2>
+    <p>You are being asked to take part in a research study conducted by <strong>Sasagi Kageyama</strong> and <strong>Yuki Kakuda</strong>, BYU–Hawaii, Math &amp; Computing Department.</p>
+    <h3>PURPOSE</h3>
+    <p>The purpose of this study is to examine how different visualization styles affect users' ability to analyze the relationship between sleep duration, stress level, and GPA.</p>
+    <h3>STUDY PROCEDURE</h3>
+    <p>It will take you approximately 10–15 minutes to complete this study. You will be shown statistical information visualized using two formats: a <strong>parallel coordinates plot</strong> and a <strong>scatter plot</strong>. You will be asked to answer analysis questions and rate your confidence in your answers. The computer program will store your responses.</p>
+    <h3>RISKS</h3>
+    <p>The risks of this study are minimal. You will be using a computer for approximately 10–15 minutes. No personally identifying information will be collected, except for your name below (which is not linked to your responses).</p>
+    <h3>BENEFITS</h3>
+    <p>There are no direct benefits other than the opportunity to see interesting visualization formats. We hope this study contributes to information visualization research.</p>
+    <h3>CONFIDENTIALITY</h3>
+    <p>Your responses will be associated with a computer-generated ID number, not your name. All response data collected will be completely anonymous. Your name is only recorded on this consent form, stored securely, and shredded after the Undergraduate Research Conference.</p>
+    <h3>VOLUNTARY PARTICIPATION</h3>
+    <p>Participation is entirely voluntary. You may stop at any time without penalty. Your decision will not affect your grades in any course.</p>
+    <h3>CONTACT</h3>
+    <p>Questions? Contact Sasagi Kageyama: <strong>sasagi1128@go.byuh.edu</strong> | 808-318-6305<br>
+    IRB Chair Boyd Timothy: <strong>boyd.timothy@byuh.edu</strong> | (808) 675-3931</p>
+  </div>
+
+  <div class="field-block">
+    <label for="p-name">Your Full Name <span style="color:var(--grey);font-weight:400">(for consent record only — not linked to your data)</span></label>
+    <input type="text" id="p-name" placeholder="First and Last Name">
+    <div class="err" id="err-name">Please enter your full name.</div>
+  </div>
+
+  <div class="field-block">
+    <label for="p-major">Your Major / Field of Study <span style="color:var(--grey);font-weight:400">(optional)</span></label>
+    <input type="text" id="p-major" placeholder="e.g. Computer Science, Business…">
+  </div>
+
+  <div class="field-block">
+    <label for="p-vis">How often do you work with charts or data visualizations?</label>
+    <select id="p-vis">
+      <option value="">Select…</option>
+      <option value="never">Rarely / Never</option>
+      <option value="sometimes">Sometimes (a few times a month)</option>
+      <option value="often">Often (weekly)</option>
+      <option value="daily">Daily</option>
+    </select>
+  </div>
+
+  <div class="check-row" onclick="toggleConsent()">
+    <input type="checkbox" id="consent-cb">
+    <label for="consent-cb">I have read and understood the information above and voluntarily agree to participate in this study.</label>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="go(0)">Back</button>
+    <button class="btn btn-primary" id="consent-btn" onclick="startStudy()" disabled>Continue →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ PAGE 2: PRACTICE ═══════════════════════════════════ -->
+<div class="page" id="pg-practice">
+<div class="wrap">
+  <div class="sec-head"><span class="badge">Practice</span><h2 class="sec-title">Practice Trial</h2></div>
+
+  <div class="note-box">⚠️ <span><strong>Practice only.</strong> This trial uses sample data and your answers will NOT be recorded. It's to help you get familiar with the task format.</span></div>
+
+  <div class="viz-card">
+    <h3>Sample Chart: Hours of Sleep by Day of Week</h3>
+    <p class="viz-sub">A simple bar chart showing sample data. Notice the axis labels and how to read values from the chart.</p>
+    <canvas id="cv-practice" width="760" height="240"></canvas>
+  </div>
+
+  <div class="q-stack">
+    <div class="q-card">
+      <div class="q-lbl">Practice Question</div>
+      <div class="q-txt">Based on the sample bar chart, which day of the week shows the <strong>highest</strong> average sleep hours?</div>
+      <div class="radio-col">
+        <label class="r-opt"><input type="radio" name="pq" value="Mon">Monday</label>
+        <label class="r-opt"><input type="radio" name="pq" value="Fri">Friday</label>
+        <label class="r-opt"><input type="radio" name="pq" value="Sat">Saturday</label>
+        <label class="r-opt"><input type="radio" name="pq" value="Sun">Sunday</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="go(1)">Back</button>
+    <button class="btn btn-primary" onclick="go(3)">Start Main Study →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ PAGE 3: VIZ A ══════════════════════════════════════ -->
+<div class="page" id="pg-viza">
+<div class="wrap">
+  <div class="sec-head"><span class="badge" id="viza-badge">Visualization 1 of 2</span><h2 class="sec-title" id="viza-title"></h2></div>
+
+  <div class="viz-card">
+    <h3 id="viza-name"></h3>
+    <p class="viz-sub" id="viza-desc"></p>
+    <canvas id="cv-a" width="820" height="460"></canvas>
+    <div class="legend" id="leg-a"></div>
+  </div>
+
+  <div id="qa-block"></div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="submitA()">Continue to Visualization 2 →</button></div>
+</div>
+</div>
+
+<!-- ══ PAGE 4: TRANSITION ════════════════════════════════ -->
+<div class="page" id="pg-trans">
+<div class="wrap">
+  <div class="transition-center">
+    <div class="big-icon">🔄</div>
+    <h2>Well done!</h2>
+    <p>You've finished the first visualization. Now you'll see the exact same data displayed in a different format. Answer the same types of questions based on your interpretation.</p>
+    <button class="btn btn-primary" onclick="go(5)">View Second Visualization →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ PAGE 5: VIZ B ══════════════════════════════════════ -->
+<div class="page" id="pg-vizb">
+<div class="wrap">
+  <div class="sec-head"><span class="badge" id="vizb-badge">Visualization 2 of 2</span><h2 class="sec-title" id="vizb-title"></h2></div>
+
+  <div class="viz-card">
+    <h3 id="vizb-name"></h3>
+    <p class="viz-sub" id="vizb-desc"></p>
+    <canvas id="cv-b" width="820" height="460"></canvas>
+    <div class="legend" id="leg-b"></div>
+  </div>
+
+  <div id="qb-block"></div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="submitB()">Go to Final Questions →</button></div>
+</div>
+</div>
+
+<!-- ══ PAGE 6: FINAL QUESTIONS ══════════════════════════ -->
+<div class="page" id="pg-final">
+<div class="wrap">
+  <div class="sec-head"><span class="badge">Step 6 of 7</span><h2 class="sec-title">Overall Preferences</h2></div>
+
+  <div class="q-stack">
+    <div class="q-card">
+      <div class="q-lbl">Preference</div>
+      <div class="q-txt">Overall, which visualization did you <strong>prefer</strong>?</div>
+      <div class="radio-col">
+        <label class="r-opt"><input type="radio" name="fpref" value="parallel">Parallel Coordinates Plot</label>
+        <label class="r-opt"><input type="radio" name="fpref" value="scatter">Scatter Plot</label>
+        <label class="r-opt"><input type="radio" name="fpref" value="none">No preference</label>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-lbl">Ease of Use</div>
+      <div class="q-txt">Which visualization did you find <strong>easier to use</strong> for answering the questions?</div>
+      <div class="radio-col">
+        <label class="r-opt"><input type="radio" name="fease" value="parallel">Parallel Coordinates Plot</label>
+        <label class="r-opt"><input type="radio" name="fease" value="scatter">Scatter Plot</label>
+        <label class="r-opt"><input type="radio" name="fease" value="none">No difference</label>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-lbl">Clarity — Parallel Coordinates</div>
+      <div class="q-txt">How <strong>clear and easy to understand</strong> was the Parallel Coordinates Plot?</div>
+      <div class="likert-row" id="lk-par-row"></div>
+      <div class="lk-labels"><span>Not clear at all</span><span>Very clear</span></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-lbl">Clarity — Scatter Plot</div>
+      <div class="q-txt">How <strong>clear and easy to understand</strong> was the Scatter Plot?</div>
+      <div class="likert-row" id="lk-sct-row"></div>
+      <div class="lk-labels"><span>Not clear at all</span><span>Very clear</span></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-lbl">Open Response</div>
+      <div class="q-txt">Please briefly explain your preferences. What made one visualization easier or harder to use than the other?</div>
+      <textarea class="open-ta" id="ta-open" rows="4" placeholder="Type your thoughts here…"></textarea>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="go(5)">Back</button>
+    <button class="btn btn-primary" onclick="submitFinal()">Submit My Responses →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ PAGE 7: THANK YOU ════════════════════════════════ -->
+<div class="page" id="pg-done">
+<div class="wrap">
+  <div class="done-hero">
+    <div class="done-check">✓</div>
+    <h1>Thank You!</h1>
+    <p>Your responses have been recorded successfully. Please let the researcher know you've finished to receive your candy reward.</p>
+    <p style="font-size:.85rem">Your responses are stored anonymously under this ID:</p>
+    <div class="pid-box" id="final-pid"></div>
+  </div>
+
+  <div class="debrief-box">
+    <h3>Debriefing</h3>
+    <p>In this study, we compared a <strong>parallel coordinates plot</strong> with a traditional <strong>scatter plot</strong> to understand which format helps people better analyze relationships between sleep duration, stress level, and GPA among university students. Your responses will be analyzed and presented at the BYU–Hawaii Undergraduate Research Conference on <strong>April 2, 2026</strong>.</p>
+    <p style="margin-top:10px">If you have any questions about the study or your rights as a participant, please contact Sasagi Kageyama at <strong>sasagi1128@go.byuh.edu</strong>.</p>
+  </div>
+
+  <div class="admin-row">
+    <button class="btn btn-ghost" onclick="toggleDataPanel()">📊 Researcher: View Data</button>
+    <button class="btn btn-ghost" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="btn btn-ghost" onclick="clearData()">🗑 Clear All Data</button>
+  </div>
+</div>
+</div>
+
+<div id="data-panel"></div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<script>
+// ─── SYNTHETIC DATASET (400 students, realistic distribution) ────────
+// Mirrors the actual dataset: sleep 5-10h, stress Low/Medium/High, GPA 2.2-4.0
+function makeDataset(n){
+  const out=[];
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  const snap=(v,d)=>Math.round(v/d)*d;
+  for(let i=0;i<n;i++){
+    const stress=['Low','Medium','High'][Math.floor(Math.random()*3)];
+    let sleep,gpa;
+    if(stress==='Low'){
+      sleep=rnd(6,10);gpa=rnd(3.0,4.0);
+    }else if(stress==='Medium'){
+      sleep=rnd(5.5,9);gpa=rnd(2.7,3.7);
+    }else{
+      sleep=rnd(5,8);gpa=rnd(2.2,3.4);
+    }
+    sleep=Math.min(10,Math.max(5,snap(sleep,0.5)));
+    gpa=Math.min(4.0,Math.max(2.2,snap(gpa,0.05)));
+    out.push({sleep,stress,gpa});
+  }
+  return out;
+}
+const DATA=makeDataset(400);
+
+// Colors matching the actual charts
+const COL={Low:'#b8d4e8',Medium:'#5a9fc0',High:'#1e4f7a'};
+const COL_ALPHA={Low:'rgba(184,212,232,0.6)',Medium:'rgba(90,159,192,0.6)',High:'rgba(30,79,122,0.65)'};
+
+// ─── STATE ───────────────────────────────────────────────────────────
+let PID='',orderParFirst=true,R={},consentOk=false,curPage=0;
+
+// ─── PAGE MANAGEMENT ─────────────────────────────────────────────────
+const PAGES=['intro','consent','practice','viza','trans','vizb','final','done'];
+const PROG=[0,12,25,38,55,68,84,100];
+const STEPLBL=['Welcome','Step 1 of 7','Practice','Step 3 of 7','Step 4 of 7','Step 5 of 7','Step 6 of 7','Complete'];
+
+function go(n){
+  document.getElementById('pg-'+PAGES[curPage]).classList.remove('active');
+  curPage=n;
+  document.getElementById('pg-'+PAGES[n]).classList.add('active');
+  document.getElementById('prog-bar').style.width=PROG[n]+'%';
+  document.getElementById('step-lbl').textContent=STEPLBL[n];
+  window.scrollTo(0,0);
+  if(n===2)setTimeout(drawPractice,50);
+  if(n===3)setTimeout(()=>renderViz('a'),50);
+  if(n===5)setTimeout(()=>renderViz('b'),50);
+  if(n===6)setTimeout(initFinalLk,50);
+}
+
+// ─── CONSENT ─────────────────────────────────────────────────────────
+function toggleConsent(){
+  consentOk=!consentOk;
+  document.getElementById('consent-cb').checked=consentOk;
+  document.getElementById('consent-btn').disabled=!consentOk;
+}
+document.getElementById('consent-cb').addEventListener('change',function(){
+  consentOk=this.checked;
+  document.getElementById('consent-btn').disabled=!consentOk;
+});
+
+function startStudy(){
+  const name=document.getElementById('p-name').value.trim();
+  if(!name){document.getElementById('err-name').style.display='block';return}
+  document.getElementById('err-name').style.display='none';
+  PID='P'+Date.now().toString(36).toUpperCase().slice(-7);
+  orderParFirst=Math.random()<0.5;
+  R={pid:PID,name,major:document.getElementById('p-major').value,
+    visFreq:document.getElementById('p-vis').value,
+    orderParFirst,ts:new Date().toISOString()};
+  go(2);
+}
+
+// ─── PRACTICE CHART ──────────────────────────────────────────────────
+function drawPractice(){
+  const cv=document.getElementById('cv-practice');
+  if(!cv)return;
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const hrs=[6.8,6.5,6.2,6.4,6.0,8.2,8.5];
+  const pad={t:20,b:36,l:40,r:16};
+  const bw=(W-pad.l-pad.r)/days.length*0.55;
+  ctx.clearRect(0,0,W,H);
+  const maxV=10;
+  days.forEach((d,i)=>{
+    const slotW=(W-pad.l-pad.r)/days.length;
+    const x=pad.l+i*slotW+slotW/2-bw/2;
+    const bh=(hrs[i]/maxV)*(H-pad.t-pad.b);
+    const y=H-pad.b-bh;
+    ctx.fillStyle=i>=5?'#1a7a5e':'#7dbfac';
+    ctx.beginPath();ctx.roundRect(x,y,bw,bh,3);ctx.fill();
+    ctx.fillStyle='#333';ctx.font='12px Inter,sans-serif';ctx.textAlign='center';
+    ctx.fillText(d,x+bw/2,H-pad.b+14);
+    ctx.fillStyle='#444';ctx.font='11px Inter,sans-serif';
+    ctx.fillText(hrs[i]+'h',x+bw/2,y-5);
+  });
+  // Y axis label
+  ctx.save();ctx.translate(13,H/2);ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='#777';ctx.font='11px Inter,sans-serif';ctx.textAlign='center';
+  ctx.fillText('Avg Hours',0,0);ctx.restore();
+}
+
+// ─── VIZ SETUP ───────────────────────────────────────────────────────
+function getOrder(){return orderParFirst?['parallel','scatter']:['scatter','parallel']}
+
+function renderViz(slot){
+  const type=getOrder()[slot==='a'?0:1];
+  const isPar=type==='parallel';
+  const num=slot==='a'?1:2;
+  document.getElementById(`viz${slot}-badge`).textContent=`Visualization ${num} of 2`;
+  document.getElementById(`viz${slot}-title`).textContent=isPar?'Parallel Coordinates Plot':'Scatter Plot';
+  document.getElementById(`viz${slot}-name`).textContent=isPar
+    ?'Parallel Coordinates: Sleep / Stress / GPA (each line = one student)'
+    :'Scatter Plot: Sleep vs GPA (color = Stress Level)';
+  document.getElementById(`viz${slot}-desc`).textContent=isPar
+    ?'Each gray line represents one student. The line connects their sleep hours (left axis) → stress level (middle) → GPA (right axis). Lines that cross show relationships between variables.'
+    :'Each dot represents one student. The X-axis shows sleep hours per day; the Y-axis shows GPA. Dot color represents the student\'s stress level.';
+  const cv=document.getElementById(`cv-${slot}`);
+  if(isPar)drawParallel(cv);else drawScatter(cv);
+  document.getElementById(`leg-${slot}`).innerHTML=
+    ['Low','Medium','High'].map(s=>
+      `<div class="leg-item">${isPar
+        ?`<div class="leg-line" style="background:${COL[s]}"></div>`
+        :`<div class="leg-dot" style="background:${COL[s]}"></div>`
+      } ${s} Stress</div>`
+    ).join('');
+  document.getElementById(`q${slot}-block`).innerHTML=buildQHTML(slot,type);
+  activateRadios();
+  setTimeout(()=>buildLK(`conf-${slot}`),30);
+}
+
+// ─── PARALLEL COORDINATES ────────────────────────────────────────────
+function drawParallel(cv){
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  const pad={t:50,b:40,l:80,r:80};
+  ctx.clearRect(0,0,W,H);
+
+  // Three axes
+  const axX=[pad.l, W/2, W-pad.r];
+  const axTop=pad.t, axBot=H-pad.b;
+
+  // Axis labels
+  ctx.fillStyle='#1c2b3a';ctx.font='bold 13px Inter,sans-serif';ctx.textAlign='center';
+  ctx.fillText('Sleep',axX[0],axTop-28);
+  ctx.fillText('Stress',axX[1],axTop-28);
+  ctx.fillText('GPA',axX[2],axTop-28);
+
+  // Draw lines (all data)
+  const sleepScale=v=>axTop+(10-v)/(10-5)*(axBot-axTop);
+  const stressMap={Low:axBot,Medium:(axTop+axBot)/2,High:axTop};
+  const gpaScale=v=>axTop+(4.0-v)/(4.0-2.2)*(axBot-axTop);
+
+  // Draw in batches by stress for layering
+  ['Low','Medium','High'].forEach(s=>{
+    const pts=DATA.filter(d=>d.stress===s);
+    ctx.strokeStyle=COL_ALPHA[s];ctx.lineWidth=0.8;
+    pts.forEach(d=>{
+      ctx.beginPath();
+      ctx.moveTo(axX[0],sleepScale(d.sleep));
+      ctx.lineTo(axX[1],stressMap[d.stress]);
+      ctx.lineTo(axX[2],gpaScale(d.gpa));
+      ctx.stroke();
+    });
+  });
+
+  // Draw axes on top
+  [0,1,2].forEach(i=>{
+    ctx.beginPath();ctx.moveTo(axX[i],axTop);ctx.lineTo(axX[i],axBot);
+    ctx.strokeStyle='#333';ctx.lineWidth=1.5;ctx.stroke();
+  });
+
+  // Y-axis ticks: Sleep
+  [5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10].forEach(v=>{
+    const y=sleepScale(v);
+    ctx.beginPath();ctx.moveTo(axX[0]-4,y);ctx.lineTo(axX[0]+4,y);
+    ctx.strokeStyle='#555';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='#555';ctx.font='10px Inter';ctx.textAlign='right';
+    ctx.fillText(v.toFixed(1),axX[0]-7,y+4);
+  });
+
+  // Stress labels
+  ['High','Medium','Low'].forEach((s,i)=>{
+    const y=i===0?axTop:i===1?(axTop+axBot)/2:axBot;
+    ctx.fillStyle='#333';ctx.font='11px Inter';ctx.textAlign='left';
+    ctx.fillText(s,axX[1]+8,y+4);
+    ctx.beginPath();ctx.moveTo(axX[1]-4,y);ctx.lineTo(axX[1]+4,y);
+    ctx.strokeStyle='#555';ctx.lineWidth=1;ctx.stroke();
+  });
+
+  // GPA ticks
+  [2.2,2.4,2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0].forEach(v=>{
+    const y=gpaScale(v);
+    ctx.beginPath();ctx.moveTo(axX[2]-4,y);ctx.lineTo(axX[2]+4,y);
+    ctx.strokeStyle='#555';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='#555';ctx.font='10px Inter';ctx.textAlign='left';
+    ctx.fillText(v.toFixed(1),axX[2]+7,y+4);
+  });
+}
+
+// ─── SCATTER PLOT ────────────────────────────────────────────────────
+function drawScatter(cv){
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  const pad={t:30,b:58,l:58,r:130};
+  ctx.clearRect(0,0,W,H);
+
+  const xS=v=>pad.l+(v-5)/5*(W-pad.l-pad.r);
+  const yS=v=>H-pad.b-(v-2.2)/1.8*(H-pad.t-pad.b);
+
+  // Grid
+  ctx.strokeStyle='rgba(0,0,0,0.06)';ctx.lineWidth=1;
+  [5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10].forEach(h=>{
+    ctx.beginPath();ctx.moveTo(xS(h),pad.t);ctx.lineTo(xS(h),H-pad.b);ctx.stroke();
+  });
+  [2.2,2.4,2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0].forEach(g=>{
+    ctx.beginPath();ctx.moveTo(pad.l,yS(g));ctx.lineTo(W-pad.r,yS(g));ctx.stroke();
+  });
+
+  // Axes
+  ctx.strokeStyle='#888';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,H-pad.b);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(pad.l,H-pad.b);ctx.lineTo(W-pad.r,H-pad.b);ctx.stroke();
+
+  // Tick labels
+  ctx.fillStyle='#555';ctx.font='10px Inter';
+  [5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10].forEach(h=>{
+    ctx.textAlign='center';ctx.fillText(h.toFixed(1),xS(h),H-pad.b+14);
+  });
+  [2.2,2.6,3.0,3.4,3.8].forEach(g=>{
+    ctx.textAlign='right';ctx.fillText(g.toFixed(1),pad.l-6,yS(g)+4);
+  });
+
+  // Axis titles
+  ctx.fillStyle='#333';ctx.font='12px Inter';
+  ctx.textAlign='center';ctx.fillText('Sleep Hours Per Day',pad.l+(W-pad.l-pad.r)/2,H-pad.b+32);
+  ctx.save();ctx.translate(16,pad.t+(H-pad.t-pad.b)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText('GPA',0,0);ctx.restore();
+
+  // Dots (Low first so High renders on top)
+  ['Low','Medium','High'].forEach(s=>{
+    DATA.filter(d=>d.stress===s).forEach(d=>{
+      ctx.beginPath();ctx.arc(xS(d.sleep),yS(d.gpa),5,0,Math.PI*2);
+      ctx.fillStyle=COL_ALPHA[s];ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,0.6)';ctx.lineWidth=0.8;ctx.stroke();
+    });
+  });
+
+  // Legend (inside canvas, top-right)
+  const lx=W-pad.r+14,ly=pad.t+10;
+  ctx.fillStyle='#1c2b3a';ctx.font='bold 11px Inter';ctx.textAlign='left';
+  ctx.fillText('Stress Level',lx,ly);
+  ['Low','Medium','High'].forEach((s,i)=>{
+    const y=ly+18+i*19;
+    ctx.beginPath();ctx.arc(lx+7,y-4,6,0,Math.PI*2);
+    ctx.fillStyle=COL[s];ctx.fill();
+    ctx.fillStyle='#333';ctx.font='11px Inter';
+    ctx.fillText(s,lx+18,y);
+  });
+}
+
+// ─── QUESTIONS HTML ──────────────────────────────────────────────────
+function buildQHTML(slot,type){
+  const vn=type==='parallel'?'parallel coordinates plot':'scatter plot';
+  return `<div class="q-stack">
+  <div class="q-card">
+    <div class="q-lbl">Task 1</div>
+    <div class="q-txt">Looking at the ${vn}, which stress level appears most strongly associated with <strong>higher GPA values</strong>?</div>
+    <div class="radio-col">
+      <label class="r-opt"><input type="radio" name="${slot}_q1" value="Low"> Low stress</label>
+      <label class="r-opt"><input type="radio" name="${slot}_q1" value="Medium"> Medium stress</label>
+      <label class="r-opt"><input type="radio" name="${slot}_q1" value="High"> High stress</label>
+      <label class="r-opt"><input type="radio" name="${slot}_q1" value="no_diff"> No clear difference</label>
+    </div>
+  </div>
+  <div class="q-card">
+    <div class="q-lbl">Task 2</div>
+    <div class="q-text" style="font-size:.97rem;font-weight:500;line-height:1.55;margin-bottom:16px">Based on the ${vn}, does <strong>shorter sleep duration</strong> appear to be associated with <strong>higher stress levels</strong>?</div>
+    <div class="radio-col">
+      <label class="r-opt"><input type="radio" name="${slot}_q2" value="yes_shorter_higher"> Yes — shorter sleep is associated with higher stress</label>
+      <label class="r-opt"><input type="radio" name="${slot}_q2" value="no_relationship"> No — there is no clear relationship</label>
+      <label class="r-opt"><input type="radio" name="${slot}_q2" value="opposite"> The opposite — shorter sleep is associated with lower stress</label>
+      <label class="r-opt"><input type="radio" name="${slot}_q2" value="unclear"> Hard to tell from this visualization</label>
+    </div>
+  </div>
+  <div class="q-card">
+    <div class="q-lbl">Task 3</div>
+    <div class="q-text" style="font-size:.97rem;font-weight:500;line-height:1.55;margin-bottom:16px">
+      <strong>Student A:</strong> 8.0 hrs sleep · Low stress · GPA 3.8<br>
+      <strong>Student B:</strong> 5.5 hrs sleep · High stress · GPA 2.5<br><br>
+      Which student appears to have a better <em>overall balance</em> of sleep, stress, and GPA?
+    </div>
+    <div class="radio-col">
+      <label class="r-opt"><input type="radio" name="${slot}_q3" value="A"> Student A (8h sleep, Low stress, GPA 3.8)</label>
+      <label class="r-opt"><input type="radio" name="${slot}_q3" value="B"> Student B (5.5h sleep, High stress, GPA 2.5)</label>
+      <label class="r-opt"><input type="radio" name="${slot}_q3" value="equal"> Both are roughly equal</label>
+    </div>
+  </div>
+  <div class="q-card">
+    <div class="q-lbl">Task 4 — Confidence</div>
+    <div class="q-text" style="font-size:.97rem;font-weight:500;line-height:1.55;margin-bottom:16px">How <strong>confident</strong> do you feel in the answers you just gave for this visualization?</div>
+    <div class="likert-row" id="conf-${slot}-row"></div>
+    <div class="lk-labels"><span>Not confident at all (1)</span><span>Very confident (5)</span></div>
+  </div>
+  </div>`;
+}
+
+function buildLK(name){
+  const el=document.getElementById(name+'-row');
+  if(el)el.innerHTML=[1,2,3,4,5].map(v=>
+    `<button class="lk-btn" data-n="${name}" data-v="${v}" onclick="pickLK(this)">${v}</button>`
+  ).join('');
+}
+function pickLK(btn){
+  document.querySelectorAll(`.lk-btn[data-n="${btn.dataset.n}"]`).forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function initFinalLk(){
+  ['lk-par','lk-sct'].forEach(id=>buildLK(id));
+  // rename for final page
+  buildLK2('lk-par-row','lk-par');
+  buildLK2('lk-sct-row','lk-sct');
+}
+function buildLK2(rowId,name){
+  const el=document.getElementById(rowId);
+  if(el)el.innerHTML=[1,2,3,4,5].map(v=>
+    `<button class="lk-btn" data-n="${name}" data-v="${v}" onclick="pickLK(this)">${v}</button>`
+  ).join('');
+}
+
+function activateRadios(){
+  document.querySelectorAll('.r-opt input[type=radio]').forEach(inp=>{
+    inp.removeEventListener('change',inp._h||null);
+    inp._h=()=>{
+      document.querySelectorAll(`.r-opt input[name="${inp.name}"]`).forEach(i=>{
+        i.closest('.r-opt').classList.toggle('sel',i.checked);
+      });
+    };
+    inp.addEventListener('change',inp._h);
+  });
+}
+new MutationObserver(activateRadios).observe(document.body,{childList:true,subtree:true});
+
+// ─── COLLECT & SUBMIT ────────────────────────────────────────────────
+function collectSlot(slot){
+  const type=getOrder()[slot==='a'?0:1];
+  const d={vizType:type};
+  ['q1','q2','q3'].forEach(q=>{
+    const s=document.querySelector(`input[name="${slot}_${q}"]:checked`);
+    d[q]=s?s.value:'';
+  });
+  const cb=document.querySelector(`.lk-btn[data-n="conf-${slot}"].sel`);
+  d.confidence=cb?cb.dataset.v:'';
+  return d;
+}
+
+function submitA(){R.vizA=collectSlot('a');go(4)}
+function submitB(){R.vizB=collectSlot('b');go(6)}
+
+function submitFinal(){
+  const p=document.querySelector('input[name="fpref"]:checked');
+  const e=document.querySelector('input[name="fease"]:checked');
+  const cp=document.querySelector('.lk-btn[data-n="lk-par"].sel');
+  const cs=document.querySelector('.lk-btn[data-n="lk-sct"].sel');
+  R.preference=p?p.value:'';
+  R.easier=e?e.value:'';
+  R.clarityParallel=cp?cp.dataset.v:'';
+  R.clarityScatter=cs?cs.dataset.v:'';
+  R.openText=document.getElementById('ta-open').value;
+  saveData();
+  go(7);
+}
+
+// ─── STORAGE ─────────────────────────────────────────────────────────
+function saveData(){
+  document.getElementById('final-pid').textContent='Participant ID: '+R.pid;
+  let all=[];try{all=JSON.parse(localStorage.getItem('byuh_viz_study')||'[]')}catch(e){}
+  all.push(R);localStorage.setItem('byuh_viz_study',JSON.stringify(all));
+}
+
+function toggleDataPanel(){
+  const p=document.getElementById('data-panel');
+  if(p.style.display==='block'){p.style.display='none';return}
+  p.style.display='block';
+  let all=[];try{all=JSON.parse(localStorage.getItem('byuh_viz_study')||'[]')}catch(e){}
+  p.innerHTML=`<strong style="color:#22a07a">[${all.length} participant(s) stored]</strong><br><br>`+
+    all.map((r,i)=>`<span style="color:#ffd">[${i+1}] ${r.pid}</span> | Order:${r.orderParFirst?'Parallel→Scatter':'Scatter→Parallel'}<br>` +
+      `  VizA(${r.vizA?.vizType}): Q1=${r.vizA?.q1||'—'} Q2=${r.vizA?.q2||'—'} Q3=${r.vizA?.q3||'—'} Conf=${r.vizA?.confidence||'—'}<br>`+
+      `  VizB(${r.vizB?.vizType}): Q1=${r.vizB?.q1||'—'} Q2=${r.vizB?.q2||'—'} Q3=${r.vizB?.q3||'—'} Conf=${r.vizB?.confidence||'—'}<br>`+
+      `  Pref=${r.preference||'—'} Easier=${r.easier||'—'} ClarPar=${r.clarityParallel||'—'} ClarSct=${r.clarityScatter||'—'}<br>`+
+      `  Open: "${r.openText||''}"<br><hr style="border-color:#333;margin:4px 0">`
+    ).join('');
+}
+
+function exportCSV(){
+  let all=[];try{all=JSON.parse(localStorage.getItem('byuh_viz_study')||'[]')}catch(e){}
+  if(!all.length){alert('No data yet.');return}
+  const hdr=['pid','name','major','visFreq','orderParFirst','ts',
+    'vizA_type','vizA_q1','vizA_q2','vizA_q3','vizA_conf',
+    'vizB_type','vizB_q1','vizB_q2','vizB_q3','vizB_conf',
+    'preference','easier','clarityParallel','clarityScatter','openText'];
+  const rows=all.map(r=>[
+    r.pid,`"${r.name||''}"`,`"${r.major||''}"`,r.visFreq,r.orderParFirst,r.ts,
+    r.vizA?.vizType,r.vizA?.q1,r.vizA?.q2,r.vizA?.q3,r.vizA?.confidence,
+    r.vizB?.vizType,r.vizB?.q1,r.vizB?.q2,r.vizB?.q3,r.vizB?.confidence,
+    r.preference,r.easier,r.clarityParallel,r.clarityScatter,
+    `"${(r.openText||'').replace(/"/g,"''")}"`
+  ].join(','));
+  const blob=new Blob([[hdr.join(','),...rows].join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='byuh_viz_study_results.csv';a.click();
+}
+
+function clearData(){
+  if(confirm('Clear all stored participant data? This cannot be undone.')){
+    localStorage.removeItem('byuh_viz_study');
+    document.getElementById('data-panel').style.display='none';
+    alert('Data cleared.');
+  }
+}
+</script>
+</body>
+</html>
